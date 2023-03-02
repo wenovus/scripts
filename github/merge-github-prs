@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Usage: merge-github-prs a b c d
+#
+# Merges branch a into branch b
+# Merges branch b into branch c
+# Merges branch c into branch d
+#
+# This is useful when there is a chain of PRs where an earlier PR changed, and
+# the later ones need updating. GitHub is bad at merging PRs into the main
+# branch and keeping things up-to-date means can just run `git merge -Xours
+# main` without worrying about previous changes being lost during conflict
+# resolution.
+
+for (( i=1; i <= "$#"; i++ )); do
+  if [ $i -gt 1 ]; then
+    read -p "merge ${!pi} into ${!i}?" -n 1 -s
+    git checkout ${!i}
+    git merge ${!pi}
+    git push
+  fi
+  pi=$i
+done
